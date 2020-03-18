@@ -25,25 +25,93 @@ $( document ).ready(function() {
     console.log("hour: " + oClock);
 
     var currentHourSelected = false;
+    var events = getData();
+    var eventsLength = Object.keys(events).length;
 
     $(".table.table-hover tbody tr").each(function(index) {
         var trVal = $(this).attr("value");
-        console.log(index);
 
         if (trVal === oClock) {
-            console.log("The top of the current hour is: " + trVal);
-            $(this).children(".event").addClass("table-warning");
+            //current hour block
+            $(this).children(".event").addClass("table-warning")
+            .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
             currentHourSelected = true;
         }
         else if (currentHourSelected === false) {  
-            $(this).children(".event").addClass("table-secondary");
+            //past hour block
+            $(this).children(".event").addClass("table-secondary")
+            .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
+            $(this).children(".save").addClass("disabled");
         }
         else {
+            //future hour block
             $(this).children(".event").addClass("table-success")
-            .append('<textarea id="' + oClock + '" placeholder="Enter an event name and details"></textarea>');
+            .append('<textarea id="' + trVal + '" placeholder="Enter an event name and details"></textarea>');
         }
+
+        if (eventsLength > 0) {
+            $.each(events, function(index, event) {
+                if (trVal === index) {
+                    console.log("Event at: " + trVal + " " + event);
+                    $("#" + trVal).val(event);
+                }
+            });
+        }
+
 
     });
 
+    $(".table-info.save").on("click", function() {
+        var elementClass = $(this).attr("class");
+        
+        if (elementClass === "table-info save") {
+            //save data:
+            var data = $(this).prev().find("textarea").val();
+            var id = $(this).prev().find("textarea").attr("id");
+
+            eventText = convertToPlainText(data);
+
+            $(this).prev().find("textarea").val(eventText).attr("id", id);
+
+            var events = getData();
+
+            if (events === null) {
+                var eventsData = {};
+                eventsData[id] = eventText;
+                setData(eventsData);
+            }
+            else {
+                events[id] = eventText;
+                setData(events);
+            }
+
+            
+        }   
+    });
+
 });
+
+function convertToPlainText(data) {
+
+    var specialCharacters = ['"', '&', '\\', '<', '>', '[', ']', '{', '}', '+', '-', '/', '*'];
+    var strArray = data.split("");
+
+    $.each(specialCharacters, function(index, character) {
+        $.each(strArray, function(index, value) {
+            if (value === character) {
+                data = data.replace(value, character);
+            }
+        });
+    });
+    
+    return data;
+}
+
+function setData(data) { //set local storage data
+    localStorage.setItem("events", JSON.stringify(data));
+}
+
+function getData() { //get local storage data
+    return JSON.parse(localStorage.getItem("events"));
+}
 

@@ -95,3 +95,11 @@ body {
   textarea {
     width: 100%;
   }
+
+  .table-info.save.disabled {
+    background-color: #E6E6E6;
+  }
+
+  .table-info.save.disabled i.fas.fa-save {
+    color: lightgray;
+  }
