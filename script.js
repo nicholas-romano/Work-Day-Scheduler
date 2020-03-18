@@ -6,13 +6,9 @@ $( document ).ready(function() {
 
     var time = moment().format('LT'); 
 
-    console.log(time);
-
     var colon = time.indexOf(":");
 
     var hour = time.substring(0, colon);
-
-    console.log("hour: ", hour);
 
     var M = time.indexOf("M") + 1;
 
@@ -22,11 +18,12 @@ $( document ).ready(function() {
 
     var oClock = hour + amOrPm;
 
-    console.log("hour: " + oClock);
-
     var currentHourSelected = false;
     var events = getData();
-    var eventsLength = Object.keys(events).length;
+
+    if (events !== null) {
+        var eventsLength = Object.keys(events).length;
+    }
 
     $(".table.table-hover tbody tr").each(function(index) {
         var trVal = $(this).attr("value");
@@ -35,6 +32,7 @@ $( document ).ready(function() {
             //current hour block
             $(this).children(".event").addClass("table-warning")
             .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
+            $(this).children(".save").addClass("disabled");
             currentHourSelected = true;
         }
         else if (currentHourSelected === false) {  
@@ -47,16 +45,22 @@ $( document ).ready(function() {
             //future hour block
             $(this).children(".event").addClass("table-success")
             .append('<textarea id="' + trVal + '" placeholder="Enter an event name and details"></textarea>');
+            $(this).children(".save").attr("data-toggle", "modal").attr("data-target", "#save-successful").addClass("edit");
         }
 
         if (eventsLength > 0) {
             $.each(events, function(index, event) {
+                //remove empty event variables:
+                if (event === "") {
+                    delete events.index;
+                }
+                //add events to each hour block:
                 if (trVal === index) {
-                    console.log("Event at: " + trVal + " " + event);
                     $("#" + trVal).val(event);
                 }
             });
         }
+        setData(events);
 
 
     });
@@ -65,6 +69,7 @@ $( document ).ready(function() {
         var elementClass = $(this).attr("class");
         
         if (elementClass === "table-info save") {
+
             //save data:
             var data = $(this).prev().find("textarea").val();
             var id = $(this).prev().find("textarea").attr("id");
@@ -72,8 +77,6 @@ $( document ).ready(function() {
             eventText = convertToPlainText(data);
 
             $(this).prev().find("textarea").val(eventText).attr("id", id);
-
-            var events = getData();
 
             if (events === null) {
                 var eventsData = {};
@@ -84,10 +87,14 @@ $( document ).ready(function() {
                 events[id] = eventText;
                 setData(events);
             }
-
+            
             
         }   
     });
+
+    $('#save-successful').on('shown.bs.modal', function () {
+        $(".modal").fadeIn();
+    })
 
 });
 

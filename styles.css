@@ -1,4 +1,4 @@
-body {
+  body {
     font-family: 'Open Sans', sans-serif;
     font-size: 16px;
     line-height: 1;
@@ -102,4 +102,12 @@ body {
 
   .table-info.save.disabled i.fas.fa-save {
     color: lightgray;
+  }
+
+  .table-info.save.edit {
+    cursor: pointer;
+  }
+
+  .modal {
+    display: none;
   }
