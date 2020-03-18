@@ -91,3 +91,7 @@ body {
     border-bottom-color: white;
     border-bottom-width: 1px;
   }
+
+  textarea {
+    width: 100%;
+  }
