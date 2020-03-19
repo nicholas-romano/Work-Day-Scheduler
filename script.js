@@ -1,104 +1,112 @@
-$( document ).ready(function() {
     
-    var date = moment().format('dddd, MMMM Do, YYYY');
+var date = moment().format('dddd, MMMM Do, YYYY');
 
-    $("#currentDay").text(date);
+$("#currentDay").text(date);
 
-    var time = moment().format('LT'); 
+var currentHour = getCurrentHour();
 
-    var colon = time.indexOf(":");
+var currentHourSelected = false;
 
-    var hour = time.substring(0, colon);
+var tabindex = 1;
 
-    var M = time.indexOf("M") + 1;
+$(document).ready(function() {
 
-    var A = M - 2;
+    creatCalendar();
 
-    var amOrPm = time.substring(A, M);
-
-    var oClock = hour + amOrPm;
-
-    var currentHourSelected = false;
-    var events = getData();
-
-    if (events !== null) {
-        var eventsLength = Object.keys(events).length;
-    }
-
-    $(".table.table-hover tbody tr").each(function(index) {
-        var trVal = $(this).attr("value");
-
-        if (trVal === oClock) {
-            //current hour block
-            $(this).children(".event").addClass("table-warning")
-            .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
-            $(this).children(".save").addClass("disabled");
-            currentHourSelected = true;
-        }
-        else if (currentHourSelected === false) {  
-            //past hour block
-            $(this).children(".event").addClass("table-secondary")
-            .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
-            $(this).children(".save").addClass("disabled");
-        }
-        else {
-            //future hour block
-            $(this).children(".event").addClass("table-success")
-            .append('<textarea id="' + trVal + '" placeholder="Enter an event name and details"></textarea>');
-            $(this).children(".save").attr("data-toggle", "modal").attr("data-target", "#save-successful").addClass("edit");
-        }
-
-        if (eventsLength > 0) {
-            $.each(events, function(index, event) {
-                //remove empty event variables:
-                if (event === "") {
-                    delete events.index;
-                }
-                //add events to each hour block:
-                if (trVal === index) {
-                    $("#" + trVal).val(event);
-                }
-            });
-        }
-        setData(events);
-
-
-    });
-
-    $(".table-info.save").on("click", function() {
+    $(".table-info.save.edit").on("click", function() {
         var elementClass = $(this).attr("class");
         
-        if (elementClass === "table-info save") {
-
-            //save data:
+        if (elementClass === "table-info save edit") {
             var data = $(this).prev().find("textarea").val();
             var id = $(this).prev().find("textarea").attr("id");
-
-            eventText = convertToPlainText(data);
-
-            $(this).prev().find("textarea").val(eventText).attr("id", id);
-
-            if (events === null) {
-                var eventsData = {};
-                eventsData[id] = eventText;
-                setData(eventsData);
-            }
-            else {
-                events[id] = eventText;
-                setData(events);
-            }
-            
-            
+            //save data:
+            saveData(data, id);
         }   
     });
 
-    $('#save-successful').on('shown.bs.modal', function () {
-        $(".modal").fadeIn();
+    $(".table-info.save.edit").on("keydown", function(event) {
+        if (event.key === "Enter") {
+            var data = $(this).prev().find("textarea").val();
+            var id = $(this).prev().find("textarea").attr("id");
+            //save data:
+            saveData(data, id);
+        }
     })
 
 });
 
-function convertToPlainText(data) {
+function getCurrentHour() {
+    var time = moment().format('LT'); 
+    var colon = time.indexOf(":");
+    var hour = time.substring(0, colon);
+    var M = time.indexOf("M") + 1;
+    var AorP = M - 2;
+    var amOrPm = time.substring(AorP, M);
+    var currentHour = hour + amOrPm;
+    return currentHour;
+}
+
+function creatCalendar() {
+
+    $(".table.table-hover tbody tr").each(function(index) {
+
+        var tRow = $(this);
+        var trVal = $(this).attr("value");
+
+        if (trVal === currentHour) {
+            //current hour block
+            $(tRow).children(".event").addClass("table-warning")
+            .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
+            $(tRow).children(".save").addClass("disabled");
+            currentHourSelected = true;
+        }
+        else if (currentHourSelected === false) {  
+            //past hour block
+            $(tRow).children(".event").addClass("table-secondary")
+            .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
+            $(tRow).children(".save").addClass("disabled");
+        }
+        else {
+            //future hour block
+            $(tRow).children(".event").addClass("table-success")
+            .append('<textarea id="' + trVal + '" placeholder="Enter an event name and details" tabindex="' + tabindex + '"></textarea>');
+            tabindex++;
+            $(tRow).children(".save").addClass("edit").attr("tabindex", tabindex);
+        }
+
+        updateData(trVal);
+
+    });
+
+}
+
+function updateData(id) {
+    var event = getData(id);
+
+    if (event !== null) {
+        $("#" + id).val(event);
+    }
+}
+
+function saveData(data, id) {
+
+    $(this).prev().find("textarea").val(eventText).attr("id", id);
+
+    var eventText = removeSpecialChars(data).trim();
+
+    if (eventText !== "") {
+        setData(id, eventText);
+        updateData(id);
+    }
+    else {
+        removeData(id);
+        updateData(id);
+    }
+    alert("Event Saved!");
+
+}
+
+function removeSpecialChars(data) {
 
     var specialCharacters = ['"', '&', '\\', '<', '>', '[', ']', '{', '}', '+', '-', '/', '*'];
     var strArray = data.split("");
@@ -106,7 +114,7 @@ function convertToPlainText(data) {
     $.each(specialCharacters, function(index, character) {
         $.each(strArray, function(index, value) {
             if (value === character) {
-                data = data.replace(value, character);
+                data = data.replace(value, "");
             }
         });
     });
@@ -114,11 +122,14 @@ function convertToPlainText(data) {
     return data;
 }
 
-function setData(data) { //set local storage data
-    localStorage.setItem("events", JSON.stringify(data));
+function setData(id, data) { //set local storage data
+    window.localStorage.setItem(id, data);
 }
 
-function getData() { //get local storage data
-    return JSON.parse(localStorage.getItem("events"));
+function getData(id) { //get local storage data
+    return window.localStorage.getItem(id);
 }
 
+function removeData(id) { //remove local storage data
+    window.localStorage.removeItem(id);
+}
