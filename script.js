@@ -10,12 +10,10 @@ var currentHourSelected = false;
 var checkForNewHour;
 
 checkForNewHour = setInterval(function() {
-    var time = moment().format('LT'); 
-    var colon = time.indexOf(":");
-    var minutes = time.substring(colon + 1, colon + 3);
-    var minsNum = parseInt(minutes);
     
-    if (minsNum <= 1) {
+    var minutes = getCurrentMinutes();
+    
+    if (minutes <= 1) {
         //reload the page at the top of the hour if textarea is not focused:
        var focus = $("textarea").is(":focus");
         if (!focus) {
@@ -61,6 +59,14 @@ function getCurrentHour() {
     var amOrPm = time.substring(AorP, M);
     var currentHour = hour + amOrPm;
     return currentHour;
+}
+
+function getCurrentMinutes() {
+    var time = moment().format('LT'); 
+    var colon = time.indexOf(":");
+    var minutes = time.substring(colon + 1, colon + 3);
+    var minsNum = parseInt(minutes);
+    return minsNum;
 }
 
 function refreshCalendar() {
