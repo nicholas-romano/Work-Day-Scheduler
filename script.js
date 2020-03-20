@@ -7,11 +7,28 @@ var currentHour = getCurrentHour();
 
 var currentHourSelected = false;
 
+var checkForNewHour;
+
+checkForNewHour = setInterval(function() {
+    var time = moment().format('LT'); 
+    var colon = time.indexOf(":");
+    var minutes = time.substring(colon + 1, colon + 3);
+    var minsNum = parseInt(minutes);
+    
+    if (minsNum <= 1) {
+        //reload the page at the top of the hour if textarea is not focused:
+       var focus = $("textarea").is(":focus");
+        if (!focus) {
+            location.reload();
+        }
+    }
+}, 60000);
+
 var tabindex = 1;
 
 $(document).ready(function() {
 
-    creatCalendar();
+    refreshCalendar();
 
     $(".table-info.save.edit").on("click", function() {
         var elementClass = $(this).attr("class");
@@ -31,7 +48,7 @@ $(document).ready(function() {
             //save data:
             saveData(data, id);
         }
-    })
+    });
 
 });
 
@@ -46,7 +63,7 @@ function getCurrentHour() {
     return currentHour;
 }
 
-function creatCalendar() {
+function refreshCalendar() {
 
     $(".table.table-hover tbody tr").each(function(index) {
 
@@ -56,20 +73,20 @@ function creatCalendar() {
         if (trVal === currentHour) {
             //current hour block
             $(tRow).children(".event").addClass("table-warning")
-            .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
+            .html('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
             $(tRow).children(".save").addClass("disabled");
             currentHourSelected = true;
         }
         else if (currentHourSelected === false) {  
             //past hour block
             $(tRow).children(".event").addClass("table-secondary")
-            .append('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
+            .html('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
             $(tRow).children(".save").addClass("disabled");
         }
         else {
             //future hour block
             $(tRow).children(".event").addClass("table-success")
-            .append('<textarea id="' + trVal + '" placeholder="Enter an event name and details" tabindex="' + tabindex + '"></textarea>');
+            .html('<textarea id="' + trVal + '" placeholder="Enter an event name and details" tabindex="' + tabindex + '"></textarea>');
             tabindex++;
             $(tRow).children(".save").addClass("edit").attr("tabindex", tabindex);
         }
@@ -81,11 +98,13 @@ function creatCalendar() {
 }
 
 function updateData(id) {
-    var event = getData(id);
 
+    var event = getData(id);
+    
     if (event !== null) {
         $("#" + id).val(event);
     }
+
 }
 
 function saveData(data, id) {
