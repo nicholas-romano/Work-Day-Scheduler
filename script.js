@@ -28,20 +28,26 @@ $(document).ready(function() {
 
     refreshCalendar();
 
-    $(".table-info.save.edit").on("click", function() {
+    $(".table-info.save.edit").on("click", function() { 
+        //save button clicked:
         var elementClass = $(this).attr("class");
         
         if (elementClass === "table-info save edit") {
+            //get the textarea box value entered:
             var data = $(this).prev().find("textarea").val();
+            //get the time id value:
             var id = $(this).prev().find("textarea").attr("id");
             //save data:
             saveData(data, id);
         }   
     });
 
-    $(".table-info.save.edit").on("keydown", function(event) {
+    $(".table-info.save.edit").on("keydown", function(event) { 
+        //enter button on keyboard clicked when save element is focused:
         if (event.key === "Enter") {
+            //get the textarea box value entered:
             var data = $(this).prev().find("textarea").val();
+            //get the time id value:
             var id = $(this).prev().find("textarea").attr("id");
             //save data:
             saveData(data, id);
@@ -50,7 +56,7 @@ $(document).ready(function() {
 
 });
 
-function getCurrentHour() {
+function getCurrentHour() { //get the current hour from the current time:
     var time = moment().format('LT'); 
     var colon = time.indexOf(":");
     var hour = time.substring(0, colon);
@@ -61,7 +67,7 @@ function getCurrentHour() {
     return currentHour;
 }
 
-function getCurrentMinutes() {
+function getCurrentMinutes() { //get current minutes from the current time:
     var time = moment().format('LT'); 
     var colon = time.indexOf(":");
     var minutes = time.substring(colon + 1, colon + 3);
@@ -106,7 +112,8 @@ function refreshCalendar() {
 function updateData(id) {
 
     var event = getData(id);
-    
+
+    //if an event exists in the time block, add it:
     if (event !== null) {
         $("#" + id).val(event);
     }
@@ -114,19 +121,23 @@ function updateData(id) {
 }
 
 function saveData(data, id) {
-
+    //get the id of the textarea box:
     $(this).prev().find("textarea").val(eventText).attr("id", id);
 
+    //sanitize the data by removing certain special characters:
     var eventText = removeSpecialChars(data).trim();
 
     if (eventText !== "") {
+        //if the textarea box is not empty, save it to local storage:
         setData(id, eventText);
         updateData(id);
     }
     else {
+        //if textarea box is empty, remove the data from local storage:
         removeData(id);
         updateData(id);
     }
+    //Alert the user that the event was saved to local storage:
     alert("Event Saved!");
 
 }
@@ -136,6 +147,8 @@ function removeSpecialChars(data) {
     var specialCharacters = ['"', '&', '\\', '<', '>', '[', ']', '{', '}', '+', '-', '/', '*'];
     var strArray = data.split("");
 
+    //loop through each of the special characters and compare it to the data string entered,
+    //remove all character matches and return the new data string:
     $.each(specialCharacters, function(index, character) {
         $.each(strArray, function(index, value) {
             if (value === character) {
