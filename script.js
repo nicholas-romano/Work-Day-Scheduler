@@ -1,16 +1,16 @@
     
-var date = moment().format('dddd, MMMM Do, YYYY');
+var date = moment().format('dddd, MMMM Do, YYYY'); //get today's date
 
-$("#currentDay").text(date);
+$("#currentDay").text(date); //add date to the top of the page
 
-var currentHour = getCurrentHour();
+var currentHour = getCurrentHour(); //get current hour:
 
 var currentHourSelected = false;
 
 var checkForNewHour;
 
 checkForNewHour = setInterval(function() {
-    
+    //checks for the top of the hour, then refreshes the browser when it reaches:
     var minutes = getCurrentMinutes();
     
     if (minutes <= 1) {
