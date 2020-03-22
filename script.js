@@ -1,4 +1,4 @@
-    
+
 var date = moment().format('dddd, MMMM Do, YYYY'); //get today's date
 
 $("#currentDay").text(date); //add date to the top of the page
@@ -12,7 +12,7 @@ var checkForNewHour;
 checkForNewHour = setInterval(function() {
     //checks for the top of the hour, then refreshes the browser when it reaches:
     var minutes = getCurrentMinutes();
-    
+
     if (minutes <= 1) {
         //reload the page at the top of the hour if textarea is not focused:
        var focus = $("textarea").is(":focus");
@@ -28,10 +28,10 @@ $(document).ready(function() {
 
     refreshCalendar();
 
-    $(".table-info.save.edit").on("click", function() { 
+    $(".table-info.save.edit").on("click", function() {
         //save button clicked:
         var elementClass = $(this).attr("class");
-        
+
         if (elementClass === "table-info save edit") {
             //get the textarea box value entered:
             var data = $(this).prev().find("textarea").val();
@@ -39,10 +39,10 @@ $(document).ready(function() {
             var id = $(this).prev().find("textarea").attr("id");
             //save data:
             saveData(data, id);
-        }   
+        }
     });
 
-    $(".table-info.save.edit").on("keydown", function(event) { 
+    $(".table-info.save.edit").on("keydown", function(event) {
         //enter button on keyboard clicked when save element is focused:
         if (event.key === "Enter") {
             //get the textarea box value entered:
@@ -57,7 +57,7 @@ $(document).ready(function() {
 });
 
 function getCurrentHour() { //get the current hour from the current time:
-    var time = moment().format('LT'); 
+    var time = moment().format('LT');
     var colon = time.indexOf(":");
     var hour = time.substring(0, colon);
     var M = time.indexOf("M") + 1;
@@ -68,7 +68,7 @@ function getCurrentHour() { //get the current hour from the current time:
 }
 
 function getCurrentMinutes() { //get current minutes from the current time:
-    var time = moment().format('LT'); 
+    var time = moment().format('LT');
     var colon = time.indexOf(":");
     var minutes = time.substring(colon + 1, colon + 3);
     var minsNum = parseInt(minutes);
@@ -89,7 +89,7 @@ function refreshCalendar() {
             $(tRow).children(".save").addClass("disabled");
             currentHourSelected = true;
         }
-        else if (currentHourSelected === false) {  
+        else if (currentHourSelected === false) {
             //past hour block
             $(tRow).children(".event").addClass("table-secondary")
             .html('<textarea id="' + trVal + '" disabled="disabled"></textarea>');
@@ -121,8 +121,6 @@ function updateData(id) {
 }
 
 function saveData(data, id) {
-    //get the id of the textarea box:
-    $(this).prev().find("textarea").val(eventText).attr("id", id);
 
     //sanitize the data by removing certain special characters:
     var eventText = removeSpecialChars(data).trim();
@@ -130,12 +128,12 @@ function saveData(data, id) {
     if (eventText !== "") {
         //if the textarea box is not empty, save it to local storage:
         setData(id, eventText);
+        //update the calendar:
         updateData(id);
     }
     else {
         //if textarea box is empty, remove the data from local storage:
         removeData(id);
-        updateData(id);
     }
     //Alert the user that the event was saved to local storage:
     alert("Event Saved!");
@@ -156,7 +154,7 @@ function removeSpecialChars(data) {
             }
         });
     });
-    
+
     return data;
 }
 
