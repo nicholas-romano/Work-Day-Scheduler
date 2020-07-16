@@ -1,4 +1,4 @@
-* Work Day Scheduler
+# Work Day Scheduler
 
 [https://nicholas-romano.github.io/Work-Day-Scheduler/](https://nicholas-romano.github.io/Work-Day-Scheduler/)
 
