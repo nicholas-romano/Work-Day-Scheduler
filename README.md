@@ -1,3 +1,7 @@
+* Work Day Scheduler
+
+[https://nicholas-romano.github.io/Work-Day-Scheduler/](https://nicholas-romano.github.io/Work-Day-Scheduler/)
+
 This is a daily planner that gives the user the ability to enter and save events to an online
 calendar for the current day from 8am until 6pm. The application is put together using
 HTML5, CSS, Bootstrap, Moment.js, and JQuery. 
